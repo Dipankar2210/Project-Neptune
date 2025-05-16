@@ -1,0 +1,146 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="text-center">Update Project</h3>
+        </div>
+        <div class="card-body">
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %}
+          <div
+            class="alert alert-{{ category if category != 'error' else 'danger' }}"
+          >
+            {{ message }}
+          </div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <form method="POST" action="{{ url_for('project.update_project', project_id=project.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label for="name" class="form-label">Project Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                value="{{ project.name }}"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                rows="3"
+              >{{ project.description }}</textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="project_type" class="form-label">Project Type</label>
+              <select
+                class="form-select"
+                id="project_type"
+                name="project_type"
+                required
+              >
+                <option value="Fixed cost" {% if project.project_type == 'Fixed cost' %}selected{% endif %}>Fixed Cost</option>
+                <option value="Time and Material" {% if project.project_type == 'Time and Material' %}selected{% endif %}>Time and Material</option>
+                <option value="Staff Augmentation" {% if project.project_type == 'Staff Augmentation' %}selected{% endif %}>Staff Augmentation</option>
+                <option value="Support" {% if project.project_type == 'Support' %}selected{% endif %}>Support</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="status" class="form-label">Project Status</label>
+              <select
+                class="form-select"
+                id="status"
+                name="status"
+                required
+              >
+                <option value="active" {% if project.status == 'active' %}selected{% endif %}>Active</option>
+                <option value="on-hold" {% if project.status == 'on-hold' %}selected{% endif %}>On Hold</option>
+                <option value="completed" {% if project.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="cancelled" {% if project.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="team_size" class="form-label">Team Size</label>
+              <input
+                type="number"
+                class="form-control"
+                id="team_size"
+                name="team_size"
+                value="{{ project.team_size }}"
+                min="1"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="monthly_cost" class="form-label"
+                >Monthly Cost (USD)</label
+              >
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="monthly_cost"
+                  name="monthly_cost"
+                  value="{{ project.monthly_cost }}"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="team_members" class="form-label"
+                >Resource Allocation</label
+              >
+              <select
+                class="form-select"
+                id="team_members"
+                name="team_members"
+                multiple
+                size="5"
+              >
+                {% for user in users %}
+                  {% if user.role in ['team_member', 'project_manager'] and user.id != current_user.id %}
+                    <option value="{{ user.id }}" {% if user in project.team_members %}selected{% endif %}>
+                      {{ user.username }} ({{ user.role|title }})
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+              <div class="form-text">
+                Hold Ctrl (Windows) or Command (Mac) to select multiple
+                resources
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                Update Project
+              </button>
+              <a
+                href="{{ url_for('project.view_project', project_id=project.id) }}"
+                class="btn btn-secondary"
+                >Cancel</a
+              >
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,104 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+AI Agent Rule: KPI Management System
+You are an expert in Python, Flask, and building secure, scalable, and modular web-based KPI management systems for IT service organizations.
+
+Key Principles
+Communicate clearly and concisely in technical language with working code samples in Python.
+
+Follow modular architecture with reusable components and organized structure.
+
+Prefer functional programming with declarative patterns, except for class-based views using Flask-RESTful.
+
+Use descriptive variable names (e.g., is_admin, has_kpi_access).
+
+Use lowercase and underscores for filenames and folders (e.g., routes/kpi_routes.py).
+
+Follow the RORO (Receive an Object, Return an Object) pattern in helper functions.
+
+Python/Flask Conventions
+Use def for defining functions with proper type hints.
+
+Structure files by feature: blueprints, models, services, forms, schemas, and utilities.
+
+Use Flask application factory pattern for configuration modularity.
+
+Organize route logic inside Flask Blueprints (e.g., admin, projects, kpi, auth).
+
+Implement RESTful APIs using Flask-RESTful.
+
+Authentication & Authorization
+Use Flask-Login for session-based authentication.
+
+Use Werkzeug Security for secure password hashing.
+
+Use Flask-Principal for role-based access control.
+
+Each route must have role-specific decorators (e.g., @role_required("admin")).
+
+Access roles include: admin, project_manager, team_member, management.
+
+Validation & Security
+Use Flask-WTF for form input validation with CSRF protection.
+
+Validate all user input with Marshmallow schemas.
+
+Ensure HTTPS for production and use secure cookies.
+
+Log failed login attempts and suspicious activities.
+
+Secure access to dashboard based on user role and assigned projects.
+
+Database
+Use SQLAlchemy as ORM for managing models like User, Project, KPI, Benchmark, Submission.
+
+Use Flask-Migrate for schema migrations.
+
+Use PostgreSQL for production and SQLite for development/testing.
+
+Graphs, Tables, UI
+Use Chart.js for rendering visual KPI trends, performance indicators, and color-coded status (RAG - Red, Amber, Green).
+
+Use DataTables.js for interactive, searchable, paginated tables.
+
+Use Jinja2 templates with Bootstrap 5 for responsive and clean frontend.
+
+Leverage modular components in templates for reusability.
+
+KPI Lifecycle Implementation Guidelines
+Projects and users are created by Admin.
+
+Project Manager creates KPIs and defines benchmarks.
+
+Team Members submit recurring KPI updates.
+
+Management accesses high-level dashboard and can leave comments.
+
+Auto-flag delays or missed benchmarks using defined thresholds.
+
+Provide color-coded visual status (Green = meets benchmark, Yellow = warning, Red = failure).
+
+Ensure audit logs are written for each KPI change.
+
+Testing & Documentation
+Use pytest for testing backend logic.
+
+Use Flask test_client for route testing.
+
+Swagger/OpenAPI using Flasgger for documenting API endpoints.
+
+Document each endpoint with expected inputs, outputs, and roles.
+
+Deployment & CI/CD
+Use Gunicorn for WSGI server in production.
+
+Deploy via Render, Railway, or Heroku.
+
+Use .env for secrets and environment-specific config.
+
+Implement CI/CD using GitHub Actions for linting, testing, and deployment.
+
+

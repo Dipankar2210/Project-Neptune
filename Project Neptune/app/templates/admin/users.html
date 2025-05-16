@@ -1,0 +1,227 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2 class="mb-4">User Management</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div
+    class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show"
+  >
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
+  <div class="card">
+    <div class="card-header">
+      <h4>Pending Users</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Registration Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in pending_users %}
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+              <td>
+                <span class="badge bg-warning">Pending</span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#assignRoleModal{{ user.id }}"
+                >
+                  Assign Role
+                </button>
+              </td>
+            </tr>
+            <!-- Role Assignment Modal -->
+            <div
+              class="modal fade"
+              id="assignRoleModal{{ user.id }}"
+              tabindex="-1"
+            >
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">
+                      Assign Role to {{ user.username }}
+                    </h5>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                    ></button>
+                  </div>
+                  <form
+                    action="{{ url_for('admin.assign_role', user_id=user.id) }}"
+                    method="POST"
+                  >
+                    <input
+                      type="hidden"
+                      name="csrf_token"
+                      value="{{ csrf_token() }}"
+                    />
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="role" class="form-label">Select Role</label>
+                        <select
+                          class="form-select"
+                          id="role"
+                          name="role"
+                          required
+                        >
+                          <option value="">Choose a role...</option>
+                          <option value="admin">Admin</option>
+                          <option value="project_manager">
+                            Project Manager
+                          </option>
+                          <option value="project_head">Project Head</option>
+                          <option value="team_member">Team Member</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                      <button type="submit" class="btn btn-primary">
+                        Assign Role
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h4>Active Users</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in active_users %}
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.role|title }}</td>
+              <td>
+                <span class="badge bg-success">Active</span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-warning btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#changeRoleModal{{ user.id }}"
+                >
+                  Change Role
+                </button>
+              </td>
+            </tr>
+            <!-- Change Role Modal -->
+            <div
+              class="modal fade"
+              id="changeRoleModal{{ user.id }}"
+              tabindex="-1"
+            >
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">
+                      Change Role for {{ user.username }}
+                    </h5>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                    ></button>
+                  </div>
+                  <form
+                    action="{{ url_for('admin.change_role', user_id=user.id) }}"
+                    method="POST"
+                  >
+                    <input
+                      type="hidden"
+                      name="csrf_token"
+                      value="{{ csrf_token() }}"
+                    />
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="new_role" class="form-label"
+                          >Select New Role</label
+                        >
+                        <select
+                          class="form-select"
+                          id="new_role"
+                          name="new_role"
+                          required
+                        >
+                          <option value="">Choose a role...</option>
+                          <option value="admin">Admin</option>
+                          <option value="project_manager">
+                            Project Manager
+                          </option>
+                          <option value="project_head">Project Head</option>
+                          <option value="team_member">Team Member</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                      <button type="submit" class="btn btn-primary">
+                        Update Role
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

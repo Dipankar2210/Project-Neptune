@@ -1,0 +1,106 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <h1>Welcome to KPI Management System</h1>
+      <p class="lead">Manage your projects and KPIs efficiently</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h3 class="mb-0">Your Projects</h3>
+          {% if current_user.role in ['admin', 'project_manager'] %}
+          <a
+            href="{{ url_for('project.create_project') }}"
+            class="btn btn-primary"
+          >
+            <i class="fas fa-plus"></i> Create New Project
+          </a>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for project in projects %}
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">{{ project.name }}</h5>
+                  <p class="card-text text-muted">
+                    {{ project.description[:100] }}{% if
+                    project.description|length > 100 %}...{% endif %}
+                  </p>
+
+                  <div class="mb-2">
+                    <strong>Type:</strong> {{ project.project_type }}
+                  </div>
+
+                  <div class="mb-2">
+                    <strong>Team Size:</strong> {{ project.team_size }}
+                  </div>
+
+                  {% if current_user.role != 'team_member' %}
+                  <div class="mb-2">
+                    <strong>Monthly Cost:</strong> ${{
+                    "%.2f"|format(project.monthly_cost) }}
+                  </div>
+
+                  <div class="mb-2">
+                    <strong>Yearly Cost:</strong> ${{
+                    "%.2f"|format(project.yearly_cost) }}
+                  </div>
+                  {% endif %}
+
+                  <div class="mb-2">
+                    <strong>Status:</strong>
+                    <span
+                      class="badge bg-{{ 'success' if project.status == 'active' else 'warning' }}"
+                    >
+                      {{ project.status|title }}
+                    </span>
+                  </div>
+
+                  <div class="mb-2">
+                    <strong>Project Manager:</strong>
+                    {{ project.project_manager.username }}
+                  </div>
+
+                  <div class="mb-2">
+                    <strong>Team Members:</strong>
+                    <ul class="list-unstyled">
+                      {% for member in project.team_members %}
+                      <li>{{ member.username }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <a
+                    href="{{ url_for('project.view_project', project_id=project.id) }}"
+                    class="btn btn-primary btn-sm"
+                  >
+                    View Details
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+              <div class="alert alert-info">
+                {% if current_user.role == 'project_manager' %} You are not
+                managing or assigned to any projects yet. {% else %} You are not
+                assigned to any projects yet. {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

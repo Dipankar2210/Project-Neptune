@@ -1,0 +1,104 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h2>Create New KPI</h2>
+  <form method="POST" action="{{ url_for('kpi.create_kpi') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+    <div class="form-group">
+      <label for="name">KPI Name</label>
+      <input type="text" class="form-control" id="name" name="name" required />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        class="form-control"
+        id="description"
+        name="description"
+        rows="3"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="project_id">Project</label>
+      <select class="form-control" id="project_id" name="project_id" required>
+        <option value="">Select Project</option>
+        {% for project in projects %}
+        <option value="{{ project.id }}">{{ project.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="unit">Unit of Measurement</label>
+      <input type="text" class="form-control" id="unit" name="unit" required />
+    </div>
+
+    <div class="form-group">
+      <label for="frequency">Update Frequency</label>
+      <select class="form-control" id="frequency" name="frequency" required>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="due_date">Due Date</label>
+      <input
+        type="date"
+        class="form-control"
+        id="due_date"
+        name="due_date"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="benchmark_value">Benchmark Value</label>
+      <input
+        type="number"
+        step="any"
+        class="form-control"
+        id="benchmark_value"
+        name="benchmark_value"
+        required
+      />
+      <small class="form-text text-muted"
+        >The target value to compare against</small
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="current_value">Current Value</label>
+      <input
+        type="number"
+        step="any"
+        class="form-control"
+        id="current_value"
+        name="current_value"
+        required
+      />
+      <small class="form-text text-muted">The initial value of the KPI</small>
+    </div>
+
+    <div class="form-group">
+      <label for="assigned_to_id">Assigned To</label>
+      <select class="form-control" id="assigned_to_id" name="assigned_to_id">
+        <option value="">Select Team Member</option>
+        {% for member in team_members %}
+        <option value="{{ member.id }}">{{ member.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create KPI</button>
+    <a href="{{ url_for('kpi.list_kpis') }}" class="btn btn-secondary"
+      >Cancel</a
+    >
+  </form>
+</div>
+{% endblock %}
