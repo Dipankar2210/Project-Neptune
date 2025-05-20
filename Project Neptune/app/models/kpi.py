@@ -21,6 +21,8 @@ class KPI(db.Model):
     frequency = db.Column(db.String(20), nullable=False)  # daily, weekly, monthly, quarterly, yearly
     due_date = db.Column(db.DateTime, nullable=False)
     benchmark_value = db.Column(db.Float, nullable=False)
+    benchmark_calculation_method = db.Column(db.String(20), nullable=False, default='manual')  # manual, average
+    benchmark_average_period = db.Column(db.String(20), nullable=True)  # 6_weeks, 9_weeks, yearly
     current_value = db.Column(db.Float, nullable=True)
     reminder = db.Column(db.String(20), nullable=True, default='none')
     status = db.Column(db.String(20), default='pending')  # pending, completed, at_risk

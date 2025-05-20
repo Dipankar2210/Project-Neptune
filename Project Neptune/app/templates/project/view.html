@@ -193,6 +193,16 @@
               {% endif %}
             </td>
           </tr>
+          <!-- Description Row -->
+          <tr class="bg-light">
+            <td colspan="7" class="p-3">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong class="me-2">Description:</strong>
+                <span>{{ kpi.description or 'No description provided.' }}</span>
+              </div>
+            </td>
+          </tr>
           <!-- Update KPI Value Modal -->
           <div
             class="modal fade"
@@ -340,107 +350,94 @@
 
   {% if current_user.role in ['admin', 'project_manager'] %}
   <div class="collapse mb-4" id="addKPIForm">
-    <div class="card card-body">
-      <h5 class="mb-3">Add New KPI</h5>
-      <form method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="name" class="form-label">KPI Name</label>
-            <input
-              type="text"
-              class="form-control"
-              id="name"
-              name="name"
-              required
-            />
+    <div class="card shadow-sm border-0" style="font-family: 'Inter', 'Segoe UI', Arial, sans-serif;">
+      <div class="card-body p-4">
+        <h5 class="mb-4 fw-bold">Add New KPI</h5>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="name" class="form-label">KPI Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Conversion Rate" required />
+            </div>
+            <div class="col-md-6">
+              <label for="unit" class="form-label">Unit</label>
+              <select class="form-select" id="unit" name="unit" required>
+                <option value="" selected disabled>Select unit...</option>
+                <option value="percentage">Percentage (%)</option>
+                <option value="number">Number</option>
+                <option value="currency">Currency ($)</option>
+                <option value="hours">Hours</option>
+                <option value="days">Days</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="benchmark_calculation_method" class="form-label">Benchmark Calculation Method</label>
+              <select class="form-select" id="benchmark_calculation_method" name="benchmark_calculation_method" required onchange="toggleBenchmarkInput()">
+                <option value="manual">Enter Manually</option>
+                <option value="average">Calculate Based on Average</option>
+              </select>
+            </div>
+            <div class="col-md-6" id="manual_benchmark_group">
+              <label for="benchmark_value" class="form-label">Benchmark Value</label>
+              <input type="number" class="form-control" id="benchmark_value" name="benchmark_value" step="0.01" placeholder="e.g. 5" />
+              <small class="form-text text-muted">The target value to compare against</small>
+            </div>
+            <div class="col-md-6" id="average_benchmark_group" style="display: none">
+              <label for="benchmark_average_period" class="form-label">Average Period</label>
+              <select class="form-select" id="benchmark_average_period" name="benchmark_average_period">
+                <option value="6_weeks">Last 6 Weeks</option>
+                <option value="9_weeks">Last 9 Weeks</option>
+                <option value="yearly">Yearly Average</option>
+              </select>
+              <small class="form-text text-muted">Select the period for calculating the average benchmark</small>
+            </div>
+            <div class="col-md-6">
+              <label for="highlight_rule" class="form-label">Highlight Rule</label>
+              <select class="form-select" id="highlight_rule" name="highlight_rule" required>
+                <option value="lt">At Risk if Current Value &lt; Benchmark</option>
+                <option value="gt">At Risk if Current Value &gt; Benchmark</option>
+                <option value="eq">At Risk if Current Value = Benchmark</option>
+                <option value="le">At Risk if Current Value ≤ Benchmark</option>
+                <option value="ge">At Risk if Current Value ≥ Benchmark</option>
+                <option value="ne">At Risk if Current Value ≠ Benchmark</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="frequency" class="form-label">Measurement Frequency</label>
+              <select class="form-select" id="frequency" name="frequency" required>
+                <option value="" selected disabled>Select frequency...</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="reminder" class="form-label">Reminder</label>
+              <select class="form-select" id="reminder" name="reminder" required>
+                <option value="none" selected>No Reminder</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="due_date" class="form-label">Due Date</label>
+              <input type="date" class="form-control" id="due_date" name="due_date" placeholder="dd-mm-yyyy" required />
+            </div>
+            <div class="col-12">
+              <label for="description" class="form-label">Description</label>
+              <textarea class="form-control" id="description" name="description" rows="2" placeholder="Describe the KPI..." required></textarea>
+            </div>
+            <div class="col-12 mt-3">
+              <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Create KPI</button>
+            </div>
           </div>
-          <div class="col-md-6 mb-3">
-            <label for="unit" class="form-label">Unit</label>
-            <select class="form-select" id="unit" name="unit" required>
-              <option value="">Select unit...</option>
-              <option value="percentage">Percentage (%)</option>
-              <option value="number">Number</option>
-              <option value="currency">Currency ($)</option>
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="benchmark_value" class="form-label"
-              >Benchmark Value</label
-            >
-            <input
-              type="number"
-              class="form-control"
-              id="benchmark_value"
-              name="benchmark_value"
-              step="0.01"
-              required
-            />
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="highlight_rule" class="form-label">Highlight Rule</label>
-            <select class="form-select" id="highlight_rule" name="highlight_rule" required>
-              <option value="lt">At Risk if Current Value &lt; Benchmark</option>
-              <option value="gt">At Risk if Current Value &gt; Benchmark</option>
-              <option value="eq">At Risk if Current Value = Benchmark</option>
-              <option value="le">At Risk if Current Value ≤ Benchmark</option>
-              <option value="ge">At Risk if Current Value ≥ Benchmark</option>
-              <option value="ne">At Risk if Current Value ≠ Benchmark</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="frequency" class="form-label"
-              >Measurement Frequency</label
-            >
-            <select
-              class="form-select"
-              id="frequency"
-              name="frequency"
-              required
-            >
-              <option value="">Select frequency...</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="quarterly">Quarterly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="reminder" class="form-label">Reminder</label>
-            <select class="form-select" id="reminder" name="reminder" required>
-              <option value="none">No Reminder</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="due_date" class="form-label">Due Date</label>
-            <input type="date" class="form-control" id="due_date" name="due_date" required />
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="description" class="form-label">Description</label>
-          <textarea
-            class="form-control"
-            id="description"
-            name="description"
-            rows="2"
-            required
-          ></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Create KPI</button>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
   {% endif %}
@@ -494,6 +491,30 @@
         renderKPIChart('sparkline-{{ kpi.id }}', labels{{ kpi.id }}, values{{ kpi.id }});
       {% endif %}
     {% endfor %}
+  });
+  function toggleBenchmarkInput() {
+    const method = document.getElementById("benchmark_calculation_method").value;
+    const manualGroup = document.getElementById("manual_benchmark_group");
+    const averageGroup = document.getElementById("average_benchmark_group");
+    const benchmarkValue = document.getElementById("benchmark_value");
+    const averagePeriod = document.getElementById("benchmark_average_period");
+    const highlightRule = document.getElementById("highlight_rule");
+    if (method === "manual") {
+      manualGroup.style.display = "block";
+      averageGroup.style.display = "none";
+      benchmarkValue.required = true;
+      averagePeriod.required = false;
+      highlightRule.required = true;
+    } else {
+      manualGroup.style.display = "none";
+      averageGroup.style.display = "block";
+      benchmarkValue.required = false;
+      averagePeriod.required = true;
+      highlightRule.required = true;
+    }
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    toggleBenchmarkInput();
   });
 </script>
 {% endblock %}

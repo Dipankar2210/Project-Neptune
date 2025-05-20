@@ -8,11 +8,22 @@ from flask_migrate import Migrate
 from app.config.config import Config
 
 # Initialize extensions
+# Initialize SQLAlchemy for database management
 db = SQLAlchemy()
+
+# Initialize Flask-Migrate for handling database migrations
 migrate = Migrate()
+
+# Initialize Flask-Login for user authentication and session management
 login_manager = LoginManager()
+
+# Initialize Flask-Mail for sending emails
 mail = Mail()
+
+# Initialize Flask-Principal for handling user roles and permissions
 principal = Principal()
+
+# Initialize CSRF protection to prevent cross-site request forgery attacks
 csrf = CSRFProtect()
 
 def create_app(config_class=Config):

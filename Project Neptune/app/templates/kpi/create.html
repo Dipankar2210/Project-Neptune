@@ -58,6 +58,22 @@
     </div>
 
     <div class="form-group">
+      <label for="benchmark_calculation_method"
+        >Benchmark Calculation Method</label
+      >
+      <select
+        class="form-control"
+        id="benchmark_calculation_method"
+        name="benchmark_calculation_method"
+        required
+        onchange="toggleBenchmarkInput()"
+      >
+        <option value="manual">Enter Manually</option>
+        <option value="average">Calculate Based on Average</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="manual_benchmark_group">
       <label for="benchmark_value">Benchmark Value</label>
       <input
         type="number"
@@ -69,6 +85,22 @@
       />
       <small class="form-text text-muted"
         >The target value to compare against</small
+      >
+    </div>
+
+    <div class="form-group" id="average_benchmark_group" style="display: none">
+      <label for="benchmark_average_period">Average Period</label>
+      <select
+        class="form-control"
+        id="benchmark_average_period"
+        name="benchmark_average_period"
+      >
+        <option value="6_weeks">Last 6 Weeks</option>
+        <option value="9_weeks">Last 9 Weeks</option>
+        <option value="yearly">Yearly Average</option>
+      </select>
+      <small class="form-text text-muted"
+        >Select the period for calculating the average benchmark</small
       >
     </div>
 
@@ -101,4 +133,34 @@
     >
   </form>
 </div>
-{% endblock %}
+
+{% block scripts %}
+<script>
+  function toggleBenchmarkInput() {
+    const method = document.getElementById(
+      "benchmark_calculation_method"
+    ).value;
+    const manualGroup = document.getElementById("manual_benchmark_group");
+    const averageGroup = document.getElementById("average_benchmark_group");
+    const benchmarkValue = document.getElementById("benchmark_value");
+    const averagePeriod = document.getElementById("benchmark_average_period");
+
+    if (method === "manual") {
+      manualGroup.style.display = "block";
+      averageGroup.style.display = "none";
+      benchmarkValue.required = true;
+      averagePeriod.required = false;
+    } else {
+      manualGroup.style.display = "none";
+      averageGroup.style.display = "block";
+      benchmarkValue.required = false;
+      averagePeriod.required = true;
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener("DOMContentLoaded", function () {
+    toggleBenchmarkInput();
+  });
+</script>
+{% endblock %} {% endblock %}

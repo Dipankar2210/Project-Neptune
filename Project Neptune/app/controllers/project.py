@@ -88,11 +88,19 @@ def view_project(project_id):
             description = request.form.get('description')
             unit = request.form.get('unit')
             frequency = request.form.get('frequency')
-            benchmark_value = request.form.get('benchmark_value')
+            benchmark_calculation_method = request.form.get('benchmark_calculation_method')
+            benchmark_average_period = request.form.get('benchmark_average_period')
             highlight_rule = request.form.get('highlight_rule')
             reminder = request.form.get('reminder')
             due_date_str = request.form.get('due_date')
             due_date = datetime.strptime(due_date_str, '%Y-%m-%d') if due_date_str else None
+
+            # Handle benchmark value based on calculation method
+            if benchmark_calculation_method == 'manual':
+                benchmark_value = float(request.form.get('benchmark_value'))
+            else:  # average
+                benchmark_value = 0.0
+                # The actual average calculation will be done in a background task
 
             kpi = KPI(
                 name=name,
@@ -100,13 +108,21 @@ def view_project(project_id):
                 project_id=project.id,
                 unit=unit,
                 frequency=frequency,
-                benchmark_value=float(benchmark_value),
+                benchmark_value=benchmark_value,
+                benchmark_calculation_method=benchmark_calculation_method,
+                benchmark_average_period=benchmark_average_period,
                 highlight_rule=highlight_rule,
                 reminder=reminder,
                 due_date=due_date
             )
             db.session.add(kpi)
             db.session.commit()
+
+            # If using average calculation, trigger the calculation
+            if benchmark_calculation_method == 'average':
+                from app.tasks import calculate_benchmark_average
+                calculate_benchmark_average.delay(kpi.id)
+
             flash('KPI created successfully!', 'success')
             return redirect(url_for('project.view_project', project_id=project.id))
         except Exception as e:

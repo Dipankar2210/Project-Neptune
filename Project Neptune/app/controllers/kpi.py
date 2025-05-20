@@ -6,6 +6,7 @@ from app.models.user import User
 from app import db
 from app.controllers.auth import role_required
 from datetime import datetime
+from app.tasks import calculate_benchmark_average
 
 kpi_bp = Blueprint('kpi', __name__)
 
@@ -39,7 +40,18 @@ def create_kpi():
             unit = request.form.get('unit')
             frequency = request.form.get('frequency')
             due_date = datetime.strptime(request.form.get('due_date'), '%Y-%m-%d')
-            benchmark_value = float(request.form.get('benchmark_value'))
+            benchmark_calculation_method = request.form.get('benchmark_calculation_method')
+            benchmark_average_period = request.form.get('benchmark_average_period')
+            
+            # Handle benchmark value based on calculation method
+            if benchmark_calculation_method == 'manual':
+                benchmark_value = float(request.form.get('benchmark_value'))
+            else:  # average
+                # For now, we'll set a default value and update it later
+                benchmark_value = 0.0
+                # Note: The actual average calculation will be done in a background task
+                # or when the KPI is first viewed
+            
             current_value = float(request.form.get('current_value'))
             assigned_to_id = request.form.get('assigned_to_id')
 
@@ -52,6 +64,8 @@ def create_kpi():
                 frequency=frequency,
                 due_date=due_date,
                 benchmark_value=benchmark_value,
+                benchmark_calculation_method=benchmark_calculation_method,
+                benchmark_average_period=benchmark_average_period,
                 current_value=current_value,
                 assigned_to_id=assigned_to_id if assigned_to_id else None
             )
@@ -68,6 +82,10 @@ def create_kpi():
             )
             db.session.add(kpi_value)
             db.session.commit()
+
+            # If using average calculation, trigger the calculation
+            if benchmark_calculation_method == 'average':
+                calculate_benchmark_average.delay(kpi.id)
 
             flash('KPI created successfully!', 'success')
             return redirect(url_for('kpi.list_kpis'))
